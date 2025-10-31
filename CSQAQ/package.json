@@ -1,0 +1,12 @@
+{
+  "name": "csqaq-proxy",
+  "version": "1.0.0",
+  "description": "CSQAQ API Proxy for Google Apps Script",
+  "main": "api/proxy.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
