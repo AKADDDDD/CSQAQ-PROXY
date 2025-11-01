@@ -1,0 +1,55 @@
+const fetch = require('node-fetch');
+
+module.exports = async (req, res) => {
+  // 设置CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  // 只允许POST请求
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  
+  try {
+    const { marketHashNameList, apiToken } = req.body;
+    
+    // 验证参数
+    if (!marketHashNameList || !apiToken) {
+      return res.status(400).json({ 
+        error: 'Missing required parameters: marketHashNameList and apiToken' 
+      });
+    }
+    
+    console.log('代理请求，物品数量:', marketHashNameList.length);
+    
+    // 调用csqaq API
+    const response = await fetch('https://api.csqaq.com/api/v1/goods/getPriceByMarketHashName', {
+      method: 'POST',
+      headers: {
+        'ApiToken': apiToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ marketHashNameList })
+    });
+    
+    const data = await response.json();
+    
+    console.log('CSQAQ API响应:', data.code);
+    
+    // 返回数据
+    res.status(200).json(data);
+    
+  } catch (error) {
+    console.error('代理错误:', error);
+    res.status(500).json({ 
+      error: '代理服务错误: ' + error.message 
+    });
+  }
+};
